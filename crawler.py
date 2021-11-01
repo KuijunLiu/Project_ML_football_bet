@@ -17,9 +17,11 @@ print("Navigated to the home page")
 def get_list_pages():
     max_page = 2
     list_pages = []
+    list_xpath = []
     while True:
         try:
             list_pages.append(driver.find_element_by_xpath(f'//*[@id="pagination"]/a[{max_page}]'))
+            list_xpath.append(f'//*[@id="pagination"]/a[{max_page}]')
             txt = list_pages[-1].text
             max_page += 1
             if max_page == 1000:
@@ -27,8 +29,13 @@ def get_list_pages():
                 break
         except:
             list_pages = list_pages[:-2]
+            list_xpath = list_xpath[:-2]
             break
-    return list_pages
+            
+    return list_pages, list_xpath
+
+def get_elements_by_xpath(list_xpath):
+    return [driver.find_element_by_xpath(x) for x in list_xpath]
 
 def get_list_matches():
     list_matches = driver.find_elements_by_partial_link_text('-')[1:]
@@ -210,10 +217,11 @@ for id_s in range(len(list_seasons)):
     print("STARTING FETCHING SEASON: ", this_season_text)
     list_seasons[id_s].click()
     time.sleep(2)
-    list_pages = get_list_pages()
+    list_pages, list_pages_xpath = get_list_pages()
     print("number of pages: " , len(list_pages))
     for id_p in range(len(list_pages)):
-        list_pages = get_list_pages()
+        list_pages = get_elements_by_xpath(list_pages_xpath)
+        print("number of pages: " , len(list_pages))
         list_pages[id_p].click()
         time.sleep(2)
         list_matches = get_list_matches()
@@ -240,7 +248,7 @@ for id_s in range(len(list_seasons)):
                 list_seasons = driver.find_elements_by_partial_link_text('/')
                 list_seasons[id_s].click()
                 time.sleep(2)
-                list_pages = get_list_pages()
+                list_pages = get_elements_by_xpath(list_pages_xpath)
                 list_pages[id_p].click()
                 time.sleep(2)
             else:
