@@ -6,6 +6,7 @@ website: https://fbref.com/
 
 reference: https://towardsdatascience.com/machine-learning-algorithms-for-football-prediction-using-statistics-from-brazilian-championship-51b7d4ea0bc8
 
+crawling repo: https://github.com/Matheuskempa/My_Udacity_Capstone
 
 
 ## Odds
