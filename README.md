@@ -14,3 +14,11 @@ crawling repo: https://github.com/Matheuskempa/My_Udacity_Capstone
 public data: https://www.football-data.co.uk/data.php
 
 website: https://www.oddsportal.com/results/#soccer
+
+------------
+P.S.
+
+you may need this configuration to clone the repository:
+```
+git config --system core.longpaths true
+```
