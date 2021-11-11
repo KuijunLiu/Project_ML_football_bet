@@ -5,10 +5,10 @@ import json
 import os
 
 options = webdriver.ChromeOptions()
-options.add_argument('headless')
+#options.add_argument('headless')
 driver = webdriver.Chrome(executable_path="chromedriver.exe", chrome_options=options)
 
-home_url = "https://www.oddsportal.com/soccer/england/premier-league/results/"
+home_url = "https://www.oddsportal.com/soccer/spain/laliga/results/"
 driver.get(home_url)
 time.sleep(2)
 print("Navigated to the home page")
@@ -40,6 +40,12 @@ def get_elements_by_xpath(list_xpath):
 def get_list_matches():
     list_matches = driver.find_elements_by_partial_link_text('-')[1:]
     return list_matches
+
+def get_list_seasons():
+    list_seasons = driver.find_elements_by_partial_link_text('/')
+    list_seasons_text = [x.text for x in list_seasons]
+    ind = [x[0] != "P" for x in list_seasons_text]
+    return [list_seasons[i] for i,t in enumerate(ind) if t]
 
 def read_odds(num=4):
     this_data = {}
@@ -76,28 +82,43 @@ def read_odds_type2(num=4):
 def fetch_match_data():
     this_data = {}
     this_data["1x2"] = read_odds()
-    fh = driver.find_element_by_link_text("1st Half")
-    fh.click()
-    time.sleep(1)
-    this_data['1x2fh'] = read_odds()
-    sh = driver.find_element_by_link_text("2nd Half")
-    sh.click()
-    time.sleep(1)
-    this_data['1x2sh'] = read_odds()
+    try:
+        fh = driver.find_element_by_link_text("1st Half")
+        fh.click()
+        time.sleep(1)
+        this_data['1x2fh'] = read_odds()
+    except:
+        print("no 1x2 first half")
+        
+    try:
+        sh = driver.find_element_by_link_text("2nd Half")
+        sh.click()
+        time.sleep(1)
+        this_data['1x2sh'] = read_odds()
+    except:
+        print("no 1x2 second half")
+        
+        
     try:
 #         mozz
         AH = driver.find_element_by_link_text("AH")
         AH.click()
         time.sleep(1)
         this_data['AH'] = read_odds_type2()
-        fh = driver.find_element_by_link_text("1st Half")
-        fh.click()
-        time.sleep(1)
-        this_data['AHfh'] = read_odds_type2()
-        sh = driver.find_element_by_link_text("2nd Half")
-        sh.click()
-        time.sleep(1)
-        this_data['AHsh'] = read_odds_type2()
+        try:
+            fh = driver.find_element_by_link_text("1st Half")
+            fh.click()
+            time.sleep(1)
+            this_data['AHfh'] = read_odds_type2()
+        except:
+            print("no 1x2 first half")
+        try:
+            sh = driver.find_element_by_link_text("2nd Half")
+            sh.click()
+            time.sleep(1)
+            this_data['AHsh'] = read_odds_type2()
+        except:
+            print("no 1x2 first half")
     except:
         print("no asian handicap for this match")
     try:
@@ -106,14 +127,20 @@ def fetch_match_data():
         OU.click()
         time.sleep(1)
         this_data['OU'] = read_odds_type2()
-        fh = driver.find_element_by_link_text("1st Half")
-        fh.click()
-        time.sleep(1)
-        this_data['OUfh'] = read_odds_type2()
-        sh = driver.find_element_by_link_text("2nd Half")
-        sh.click()
-        time.sleep(1)
-        this_data['OUsh'] = read_odds_type2()
+        try:
+            fh = driver.find_element_by_link_text("1st Half")
+            fh.click()
+            time.sleep(1)
+            this_data['OUfh'] = read_odds_type2()
+        except:
+            print("no 1x2 first half")
+        try:
+            sh = driver.find_element_by_link_text("2nd Half")
+            sh.click()
+            time.sleep(1)
+            this_data['OUsh'] = read_odds_type2()
+        except:
+            print("no 1x2 first half")
     except:
         print("no over/under for this match")
     try:
@@ -122,14 +149,20 @@ def fetch_match_data():
         EH.click()
         time.sleep(1)
         this_data['EH'] = read_odds_type2(num=5)
-        fh = driver.find_element_by_link_text("1st Half")
-        fh.click()
-        time.sleep(1)
-        this_data['EHfh'] = read_odds_type2(num=5)
-        sh = driver.find_element_by_link_text("2nd Half")
-        sh.click()
-        time.sleep(1)
-        this_data['EHsh'] = read_odds_type2(num=5)
+        try:
+            fh = driver.find_element_by_link_text("1st Half")
+            fh.click()
+            time.sleep(1)
+            this_data['EHfh'] = read_odds_type2(num=5)
+        except:
+            print("no 1x2 first half")
+        try:
+            sh = driver.find_element_by_link_text("2nd Half")
+            sh.click()
+            time.sleep(1)
+            this_data['EHsh'] = read_odds_type2(num=5)
+        except:
+            print("no 1x2 first half")
     except:
         print("no over/under for this match")
     more_bets = "More bets"
@@ -141,14 +174,20 @@ def fetch_match_data():
         OE.click()
         time.sleep(1)
         this_data['OE'] = read_odds(num=3)
-        fh = driver.find_element_by_link_text("1st Half")
-        fh.click()
-        time.sleep(1)
-        this_data['OEfh'] = read_odds(num=3)
-        sh = driver.find_element_by_link_text("2nd Half")
-        sh.click()
-        time.sleep(1)
-        this_data['OEsh'] = read_odds(num=3)
+        try:
+            fh = driver.find_element_by_link_text("1st Half")
+            fh.click()
+            time.sleep(1)
+            this_data['OEfh'] = read_odds(num=3)
+        except:
+            print("no 1x2 first half")
+        try:
+            sh = driver.find_element_by_link_text("2nd Half")
+            sh.click()
+            time.sleep(1)
+            this_data['OEsh'] = read_odds(num=3)
+        except:
+            print("no 1x2 first half")
         more_bets = "Odd or Even"
     except:
         print("no odd/even for this match")
@@ -160,14 +199,20 @@ def fetch_match_data():
         BTS.click()
         time.sleep(1)
         this_data['BTS'] = read_odds(num=3)
-        fh = driver.find_element_by_link_text("1st Half")
-        fh.click()
-        time.sleep(1)
-        this_data['BTSfh'] = read_odds(num=3)
-        sh = driver.find_element_by_link_text("2nd Half")
-        sh.click()
-        time.sleep(1)
-        this_data['BTSsh'] = read_odds(num=3)
+        try:
+            fh = driver.find_element_by_link_text("1st Half")
+            fh.click()
+            time.sleep(1)
+            this_data['BTSfh'] = read_odds(num=3)
+        except:
+            print("no 1x2 first half")
+        try:
+            sh = driver.find_element_by_link_text("2nd Half")
+            sh.click()
+            time.sleep(1)
+            this_data['BTSsh'] = read_odds(num=3)
+        except:
+            print("no 1x2 first half")
         more_bets = "Both Teams to Score"
     except:
         print("no both_team_to_score for this match")
@@ -179,14 +224,20 @@ def fetch_match_data():
         DC.click()
         time.sleep(1)
         this_data['DC'] = read_odds()
-        fh = driver.find_element_by_link_text("1st Half")
-        fh.click()
-        time.sleep(1)
-        this_data['DCfh'] = read_odds()
-        sh = driver.find_element_by_link_text("2nd Half")
-        sh.click()
-        time.sleep(1)
-        this_data['DCsh'] = read_odds()
+        try:
+            fh = driver.find_element_by_link_text("1st Half")
+            fh.click()
+            time.sleep(1)
+            this_data['DCfh'] = read_odds()
+        except:
+            print("no 1x2 first half")
+        try:
+            sh = driver.find_element_by_link_text("2nd Half")
+            sh.click()
+            time.sleep(1)
+            this_data['DCsh'] = read_odds()
+        except:
+            print("no 1x2 first half")
         more_bets = "Double Chance"
     except:
         print("no double_chance for this match")
@@ -212,7 +263,7 @@ print("number of seasons in this page: " , len(list_seasons))
 num_data = len(os.listdir("data_crawl"))
 ct = 0
 for id_s in range(len(list_seasons)):
-    list_seasons = driver.find_elements_by_partial_link_text('/')
+    list_seasons = get_list_seasons()
     this_season_text = list_seasons[id_s].text
     print("STARTING FETCHING SEASON: ", this_season_text)
     list_seasons[id_s].click()
@@ -245,7 +296,7 @@ for id_s in range(len(list_seasons)):
 
                 driver.get(home_url)
                 time.sleep(2)
-                list_seasons = driver.find_elements_by_partial_link_text('/')
+                list_seasons = get_list_seasons()
                 list_seasons[id_s].click()
                 time.sleep(2)
                 list_pages = get_elements_by_xpath(list_pages_xpath)
