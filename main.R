@@ -1,130 +1,55 @@
 library(dplyr)
 library(rlang)
 library(readr)
-# all_data = read.csv(file = 'data/fulldata.csv')
-all_data = list.files(path="../PJ/data", full.names = TRUE) %>% lapply(read_csv) %>% bind_rows()
-all_data$Date <- as.Date(all_data$Date, "%d/%m/%y")
-all_data = all_data[order(all_data$Date),]
-
-match_info = all_data[, c("Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "HTHG", "HTAG", "HS", "AS", "HST", "AST", "HC", "AC", "HF", "AF")]
-match_info = match_info[complete.cases(match_info), ]
-match_info$GT = match_info$FTHG + match_info$FTAG
-
-
-hist(match_info$GT)
-
-
-
-all_match_info = data.frame()
-pb = txtProgressBar(min = 0, max = nrow(match_info), initial = 0) 
-for (i in c(1:nrow(match_info))){
-  this_home = match_info$HomeTeam[i]
-  this_away = match_info$AwayTeam[i]
-  this_part = match_info[1:(i-1),]
-  this_part_home = this_part[this_part$HomeTeam == this_home | this_part$AwayTeam == this_home,]
-  this_part_away = this_part[this_part$HomeTeam == this_away | this_part$AwayTeam == this_away,]
-  if (nrow(this_part_home) < 5 | nrow(this_part_away) < 5){
-    next
-  }
-  this_part_home = tail(this_part_home, n=5)
-  this_part_away = tail(this_part_away, n=5)
-  new_df_home = data.frame()
-  new_df_away = data.frame()
-  for (j in c(1:5)){
-    if (this_part_home$HomeTeam[j] == this_home){
-      this_row_home = data.frame("FG"=this_part_home$FTHG[j],
-                                 "HG"=this_part_home$HTHG[j],
-                                 "S"=this_part_home$HS[j],
-                                 "ST"=this_part_home$HST[j],
-                                 "C"=this_part_home$HC[j],
-                                 "F"=this_part_home$HF[j])
-    } else {
-      this_row_home = data.frame("FG"=this_part_home$FTAG[j],
-                                 "HG"=this_part_home$HTAG[j],
-                                 "S"=this_part_home$AS[j],
-                                 "ST"=this_part_home$AST[j],
-                                 "C"=this_part_home$AC[j],
-                                 "F"=this_part_home$AF[j])
-    }
-    new_df_home = rbind(new_df_home, this_row_home)
-    
-    
-    if (this_part_away$HomeTeam[j] == this_away){
-      this_row_away = data.frame("FG"=this_part_away$FTHG[j],
-                                 "HG"=this_part_away$HTHG[j],
-                                 "S"=this_part_away$HS[j],
-                                 "ST"=this_part_away$HST[j],
-                                 "C"=this_part_away$HC[j],
-                                 "F"=this_part_away$HF[j])
-    } else {
-      this_row_away = data.frame("FG"=this_part_away$FTAG[j],
-                                 "HG"=this_part_away$HTAG[j],
-                                 "S"=this_part_away$AS[j],
-                                 "ST"=this_part_away$AST[j],
-                                 "C"=this_part_away$AC[j],
-                                 "F"=this_part_away$AF[j])
-    }
-    new_df_away = rbind(new_df_away, this_row_away)
-  }
-  this_math_info = data.frame("HFG_min" = min(new_df_home$FG),
-                              "HFG_mean" = mean(new_df_home$FG),
-                              "HFG_max" = max(new_df_home$FG),
-                              "HHG_min" = min(new_df_home$HG),
-                              "HHG_mean" = mean(new_df_home$HG),
-                              "HHG_max" = max(new_df_home$HG),
-                              "HS_min" = min(new_df_home$S),
-                              "HS_mean" = mean(new_df_home$S),
-                              "HS_max" = max(new_df_home$S),
-                              "HST_min" = min(new_df_home$ST),
-                              "HST_mean" = mean(new_df_home$ST),
-                              "HST_max" = max(new_df_home$ST),
-                              "HC_min" = min(new_df_home$C),
-                              "HC_mean" = mean(new_df_home$C),
-                              "HC_max" = max(new_df_home$C),
-                              "HF_min" = min(new_df_home$F),
-                              "HF_mean" = mean(new_df_home$F),
-                              "HF_max" = max(new_df_home$F),
-                              "AFG_min" = min(new_df_away$FG),
-                              "AFG_mean" = mean(new_df_away$FG),
-                              "AFG_max" = max(new_df_away$FG),
-                              "AHG_min" = min(new_df_away$HG),
-                              "AHG_mean" = mean(new_df_away$HG),
-                              "AHG_max" = max(new_df_away$HG),
-                              "AS_min" = min(new_df_away$S),
-                              "AS_mean" = mean(new_df_away$S),
-                              "AS_max" = max(new_df_away$S),
-                              "AST_min" = min(new_df_away$ST),
-                              "AST_mean" = mean(new_df_away$ST),
-                              "AST_max" = max(new_df_away$ST),
-                              "AC_min" = min(new_df_away$C),
-                              "AC_mean" = mean(new_df_away$C),
-                              "AC_max" = max(new_df_away$C),
-                              "AF_min" = min(new_df_away$F),
-                              "AF_mean" = mean(new_df_away$F),
-                              "AF_max" = max(new_df_away$F),
-                              "GT" = match_info$GT[i])
-  
-  all_match_info = rbind(all_match_info, this_math_info)
-  setTxtProgressBar(pb,i)
-}
-close(pb)
-
-spec = c(train = .6, test = .2, validate = .2)
-
-g = sample(cut(
-  seq(nrow(all_match_info)), 
-  nrow(all_match_info)*cumsum(c(0,spec)),
-  labels = names(spec)
-))
-
-res = split(all_match_info, g)
-
-train = res$train
-valid = res$valid
-test = res$test
-
-
 library(magrittr)
+library(ggplot2)
+
+load("data_last/train_features.Rda")
+load("data_last/valid_features.Rda")
+load("data_last/test_features.Rda")
+
+load("data_last/train_targets.Rda")
+load("data_last/valid_targets.Rda")
+load("data_last/test_targets.Rda")
+
+# pm = glm(`train_targets$GT` ~ ., family="poisson", data = cbind(train_normalized, train_targets$GT))
+# pm = lm(1/`train_targets$Bb25` ~ ., data = cbind(train_normalized, train_targets$Bb25))
+pm = glm(as.factor(`train_targets$GT` > 2.5) ~ ., data = cbind(train_normalized, train_targets$GT), family = "binomial")
+summary(pm)
+
+# VGT = predict(pm, valid_normalized, type="response")
+VBb25 = predict(pm, valid_normalized, type="response")
+
+hist(pm$fitted.values)
+hist(valid_targets$GT - VGT)
+plot(valid_targets$GT, VGT)
+
+
+# ggplot(cbind(valid_targets, as.data.frame(VGT)), aes(x=GT, y=VGT)) + geom_point()
+ggplot(cbind(valid_targets, as.data.frame(VBb25)), aes(x=1/Bb25, y=VBb25, color = sign(GT>2.5))) + geom_point()
+ggplot(cbind(valid_targets, as.data.frame(VBb25)), aes(x=as.factor(GT>2.5), y=1/Bb25, color = sign(GT>2.5))) + geom_boxplot(notch=FALSE)
+
+ggplot(cbind(valid_targets, as.data.frame(VBb25)), aes(x=as.factor(GT>2.5), y=VBb25, color = sign(GT>2.5))) + geom_boxplot(notch=FALSE)
+ggplot(cbind(valid_targets, as.data.frame(VBb25)), aes(x=as.factor(GT>2.5), y=VBb25, color = sign(GT>2.5))) + geom_boxplot(notch=FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## LINEAR REGRESSION
@@ -162,10 +87,12 @@ plot(sort(rmse/sd(Y1)),type='l')
 
 ### RIDGE REGRESSION
 p=ncol(X0)
+# p=5
 Y0=train$GT
 X0=as.matrix(train[,-ncol(train)])
+# X0=as.matrix(train[,1:5])
 
-lambda=20
+lambda=50
 betaRidge=solve(crossprod(X0)+lambda*diag(p))%*%t(X0)%*%Y0
 HRidge=crossprod(t(X0),solve(crossprod(X0)+lambda*diag(p)))%*%t(X0)
 ychap_ridge=X0%*%betaRidge
@@ -182,11 +109,13 @@ for(i in c(1:K))
   data0_bis=train[sel,]
   Y0=data0_bis$GT
   X0=as.matrix(data0_bis[,-ncol(train)])
+  # X0=as.matrix(data0_bis[,1:5])
   beta=solve(crossprod(X0)+lambda*diag(p))%*%t(X0)%*%Y0
   BETAridge=cbind(BETAridge,beta) 
   
   Y1=valid$GT
   X1=as.matrix(valid[,-ncol(valid)])
+  # X1=as.matrix(valid[,1:5])
   reg.forecast=X1%*%beta
   rmseridge=c(rmseridge,sqrt(mean((Y1-reg.forecast)^2))) 
 }
@@ -202,6 +131,38 @@ legend('top',col=c("black","red"),c("Reg. lineaire","ridge"),lty=1,bty='n',lwd=2
 
 
 plot(reg.forecast, valid$GT)
+
+high_pred = valid$GT[reg.forecast>2.5]
+score = sum(high_pred>2.5)/length(high_pred)
+score
+
+hist(valid$GT)
+hist(reg.forecast)
+
+pm = glm(GT ~ ., family="poisson", data=train)
+pp = predict(pm, valid, type="response")
+hist(pp)
+plot(reg.forecast, valid$GT)
+high_pred = valid$GT[pp>2.5]
+score = sum(high_pred>2.5)/length(high_pred)
+score
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
